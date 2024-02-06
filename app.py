@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 import os
 
 app = Flask(__name__)
@@ -40,9 +40,13 @@ def allowed_file(filename):
 
 all_cars = []
 
-@app.route('/api/all_cars', methods=['GET'])
-def get_all_cars():
+@app.route('/api/cars', methods=['GET'])
+def get_cars():
     return jsonify([car.to_dict() for car in all_cars])
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/api/cars', methods=['POST'])
 def add_car():

@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
+# Указываем разрешенные методы запроса
 cors = CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST"]}})
 
 UPLOAD_FOLDER = 'uploads'
@@ -23,33 +24,38 @@ def get_cars():
 
 @app.route('/api/cars', methods=['POST'])
 def add_car():
-    data = request.form.to_dict()
+    try:
+        data = request.form.to_dict()
 
-    new_car = {
-        "brand": data["brand"],
-        "model": data["model"],
-        "type": data["type"],
-        "year": int(data["year"]),
-        "price": int(data["price"]),
-        "color": data["color"],
-        "weight": int(data["weight"]),
-        "mileage": int(data["mileage"]),
-        "specs": data["specs"],
-        "photo": ''  # This will be updated with the uploaded file path
-    }
+        new_car = {
+            "brand": data["brand"],
+            "model": data["model"],
+            "type": data["type"],
+            "year": int(data["year"]),
+            "price": int(data["price"]),
+            "color": data["color"],
+            "weight": int(data["weight"]),
+            "mileage": int(data["mileage"]),
+            "specs": data["specs"],
+            "photo": ''  # This will be updated with the uploaded file path
+        }
 
-    # Handle file upload
-    if 'photo' in request.files:
-        file = request.files['photo']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            new_car["photo"] = file_path
+        # Handle file upload
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+                new_car["photo"] = file_path
 
-    cars.append(new_car)
+        cars.append(new_car)
 
-    return jsonify({'message': 'Car added successfully!'})
+        return jsonify({'message': 'Car added successfully!'})
+
+    except Exception as e:
+        print(f"Error adding car: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':
     if not os.path.exists(UPLOAD_FOLDER):

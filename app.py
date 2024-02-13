@@ -14,11 +14,11 @@ cars = []
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/cars', methods=['GET'])
+@app.route('api/cars', methods=['GET'])
 def get_cars():
     return jsonify({'cars': cars})
 
-@app.route('/cars', methods=['POST'])
+@app.route('api/cars', methods=['POST'])
 def add_car():
     data = request.form.to_dict()
 

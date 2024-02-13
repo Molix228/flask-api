@@ -40,6 +40,10 @@ def add_car():
             "photo": ''  # This will be updated with the uploaded file path
         }
 
+        # Create the 'uploads' folder if it doesn't exist
+        if not os.path.exists(app.config['UPLOAD_FOLDER']):
+            os.makedirs(app.config['UPLOAD_FOLDER'])
+
         # Handle file upload
         if 'photo' in request.files:
             file = request.files['photo']
@@ -54,10 +58,9 @@ def add_car():
         return jsonify({'message': 'Car added successfully!'})
 
     except Exception as e:
-        print(f"Error adding car: {str(e)}")
-        return jsonify({'error': 'Internal Server Error'}), 500
+        error_message = f"Error adding car: {str(e)}"
+        print(error_message)
+        return jsonify({'error': error_message}), 500
 
 if __name__ == '__main__':
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
     app.run(debug=True)

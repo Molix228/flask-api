@@ -6,10 +6,15 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
+# Режим разработки (для локального сервера)
+if os.environ.get('FLASK_ENV') == 'development':
+    app.config['DEBUG'] = True
+
 # Устанавливаем CORS только для нужных методов
 CORS(app, resources={r"/api/cars": {"origins": "*", "methods": ["GET", "POST"]}})
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+# Конфигурация базы данных
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png', 'gif'}
 
@@ -96,7 +101,6 @@ def add_car():
         return jsonify({'error': error_message}), 500
 
 if __name__ == '__main__':
-    # app.run(debug=True)  # Закомментируйте эту строку
     import os
 
     # Убедимся, что Gunicorn будет использовать несколько процессов

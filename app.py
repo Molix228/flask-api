@@ -96,4 +96,29 @@ def add_car():
         return jsonify({'error': error_message}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)  # Закомментируйте эту строку
+    import os
+
+    # Убедимся, что Gunicorn будет использовать несколько процессов
+    workers = int(os.environ.get('GUNICORN_WORKERS', '4'))
+
+    # Запуск приложения с использованием Gunicorn
+    from gunicorn.app.base import BaseApplication
+
+    class StandaloneApplication(BaseApplication):
+        def __init__(self, app, workers=4):
+            self.application = app
+            self.workers = workers
+            super().__init__()
+
+        def load_config(self):
+            from gunicorn.config import Config
+            config = Config()
+            config.set('workers', self.workers)
+            return config
+
+        def load(self):
+            return self.application
+
+    standalone_app = StandaloneApplication(app, workers)
+    standalone_app.run()

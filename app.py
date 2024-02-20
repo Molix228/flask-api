@@ -6,7 +6,13 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
+# Устанавливаем CORS только для нужных методов
+CORS(app, resources={r"/api/cars": {"origins": "*", "methods": ["GET", "POST"]}})
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png', 'gif'}
+
 db = SQLAlchemy(app)
 
 class Car(db.Model):
@@ -23,17 +29,12 @@ class Car(db.Model):
     description = db.Column(db.String(200), nullable=False)
     photo = db.Column(db.String(200), nullable=False)
 
-# Указываем разрешенные методы запроса
-cors = CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST"]}})
-
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+# Создаем 'uploads' директорию, если она не существует
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 @app.route('/api/cars', methods=['GET'])
 def get_cars():
@@ -45,9 +46,16 @@ def add_car():
     try:
         data = request.form.to_dict()
 
-        # Create the 'uploads' folder if it doesn't exist
-        if not os.path.exists(app.config['UPLOAD_FOLDER']):
-            os.makedirs(app.config['UPLOAD_FOLDER'])
+        # Проверяем наличие обязательных полей
+        required_fields = ['brand', 'model', 'axle', 'type', 'year', 'price', 'color', 'weight', 'mileage', 'description']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+
+        # Валидация полей year, price, weight, mileage
+        for numeric_field in ['year', 'price', 'weight', 'mileage']:
+            if not data[numeric_field].isdigit():
+                return jsonify({'error': f'Invalid value for {numeric_field}'}), 400
 
         # Handle multiple file upload
         photos = []
@@ -85,6 +93,4 @@ def add_car():
         return jsonify({'error': error_message}), 500
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)

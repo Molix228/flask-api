@@ -1,4 +1,4 @@
-#!/Users/molix/Downloads/flask-api/venv/bin/python
+#!/Users/molix/Downloads/flask-api/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys

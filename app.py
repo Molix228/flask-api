@@ -54,6 +54,7 @@ def get_cars():
         return jsonify({'cars': car_list})
 
     except Exception as e:
+        app.logger.error(e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/cars', methods=['POST'])

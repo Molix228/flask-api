@@ -86,14 +86,12 @@ def add_car():
         db.session.add(new_car)
         db.session.commit()
 
-        print("No errors so far")
-
         return jsonify({"message": "Car added successfully!"})
 
 
     except Exception as e:
 
-        print("Error:", e)
+        app.logger.error("Error:", e)
         return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == '__main__':

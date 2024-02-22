@@ -85,11 +85,13 @@ def add_car():
         db.session.add(new_car)
         db.session.commit()
 
-        return jsonify({'message': 'Car added successfully!'}), 201
+        print("No errors so far")
+
+        return jsonify({"message": "Car added successfully!"})
 
     except Exception as e:
-        app.logger.error(e)
-        return jsonify({'error': str(e)}), 500
+        print(f"An error occurred: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

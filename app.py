@@ -90,9 +90,11 @@ def add_car():
 
         return jsonify({"message": "Car added successfully!"})
 
+
     except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
+
+        print("Error:", e)
+        return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

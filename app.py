@@ -88,6 +88,7 @@ def add_car():
         return jsonify({'message': 'Car added successfully!'}), 201
 
     except Exception as e:
+        app.logger.error(e)
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

@@ -1,8 +1,4 @@
 import os
-
-import os
-import traceback
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -13,6 +9,8 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 db = SQLAlchemy(app)
 
 class Car(db.Model):
@@ -31,6 +29,11 @@ class Car(db.Model):
 
 with app.app_context():
     db.create_all()
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
 @app.route('/api/cars', methods=['GET'])
 def get_cars():
@@ -55,8 +58,7 @@ def get_cars():
         return jsonify({'cars': car_list})
 
     except Exception as e:
-        app.logger.error(e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @app.route('/api/cars', methods=['POST'])
 def add_car():
@@ -64,10 +66,14 @@ def add_car():
         data = request.form
         file = request.files['photo']
 
-        # Сохраняем файл на сервере
-        if file:
+        if not all(data[key] for key in ['brand', 'model', 'year', 'price']):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        if file and allowed_file(file.filename) and file.content_length <= MAX_CONTENT_LENGTH:
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        else:
+            return jsonify({"error": "Invalid file"}), 400
 
         new_car = Car(
             brand=data['brand'],
@@ -79,7 +85,7 @@ def add_car():
             color=data['color'],
             weight=data['weight'],
             mileage=data['mileage'],
-            photo=filename,  # Сохраняем имя файла в базе данных
+            photo=filename,
             description=data['description']
         )
 
@@ -88,11 +94,9 @@ def add_car():
 
         return jsonify({"message": "Car added successfully!"})
 
-
     except Exception as e:
-
-        app.logger.error("Error:", e)
-        return jsonify({"error": "Internal Server Error"}), 500
+        db.session.rollback()
+        return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

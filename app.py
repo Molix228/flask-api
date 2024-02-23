@@ -112,7 +112,6 @@ def add_car():
             return jsonify({"error": "Invalid form data"}), 400
 
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
 

@@ -71,6 +71,8 @@ def add_car():
 
         if file and allowed_file(file.filename) and file.content_length <= MAX_CONTENT_LENGTH:
             filename = secure_filename(file.filename)
+            print(data)
+            print(file)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         else:
             return jsonify({"error": "Invalid file"}), 400

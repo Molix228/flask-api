@@ -54,6 +54,30 @@ def allowed_file(filename):
 
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
+@app.route('/api/cars', methods=['GET'])
+def get_cars():
+    try:
+        cars = Car.query.all()
+        car_list = []
+        for car in cars:
+            car_list.append({
+                'id': car.id,
+                'brand': car.brand,
+                'model': car.model,
+                'type': car.type,
+                'axle': car.axle,
+                'year': car.year,
+                'price': car.price,
+                'color': car.color,
+                'weight': car.weight,
+                'mileage': car.mileage,
+                'photo': car.photo,
+                'description': car.description
+            })
+        return jsonify({'cars': car_list})
+
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @app.route('/api/cars', methods=['POST'])
 def add_car():

@@ -54,7 +54,7 @@ def allowed_file(filename):
 
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
-@app.route('/api/cars', methods=['GET'])
+@app.route('/api/', methods=['GET'])
 def get_cars():
     try:
         cars = Car.query.all()

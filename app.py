@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -57,7 +55,7 @@ def allowed_file(filename):
 
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
-@app.route('/api/', methods=['GET'])
+@app.route('/api/cars', methods=['GET'])
 def get_cars():
     try:
         cars = Car.query.all()
@@ -115,6 +113,7 @@ def add_car():
             return jsonify({"error": "Invalid form data"}), 400
 
     except Exception as e:
+        db.session.rollback()
         return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
 

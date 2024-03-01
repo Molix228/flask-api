@@ -82,7 +82,7 @@ def add_car():
             color=form['color'],
             weight=form['weight'],
             mileage=form['mileage'],
-            photo=form['photo'],
+            photo=filename,
             description=form['description']
         )
 

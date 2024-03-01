@@ -54,7 +54,7 @@ def get_cars():
                 'color': car.color,
                 'weight': car.weight,
                 'mileage': car.mileage,
-                'photo': url_for('static', filename=f'/uploads/{car.photo}'),
+                'photo': url_for('static', filename=f'uploads/{car.photo}'),
                 'description': car.description
             })
         return jsonify({'cars': car_list})

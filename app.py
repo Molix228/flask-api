@@ -95,5 +95,25 @@ def add_car():
         db.session.rollback()
         return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
+@app.route('/api/cars/<int:car_id>', methods=['DELETE'])
+def delete_car(car_id):
+    try:
+        car = Car.query.get_or_404(car_id)
+        # Удаление изображения из папки uploads
+        if car.photo:
+            photo_path = os.path.join(app.config['UPLOAD_FOLDER'], car.photo)
+            if os.path.exists(photo_path):
+                os.remove(photo_path)
+
+        db.session.delete(car)
+        db.session.commit()
+
+        return jsonify({"message": "Car deleted successfully!"})
+    except Exception as e:
+        print("Error:", e)
+        db.session.rollback()
+        return jsonify({"error": f"Internal Server Error: {e}"}), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True)

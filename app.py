@@ -86,6 +86,10 @@ def add_car():
     try:
         form = CarForm(request.form)
 
+        print("Form Data:")
+        for field in form:
+            print(f"{field.name}: {field.data}")
+
         if form.validate_on_submit():
             file = request.files['photo']
 

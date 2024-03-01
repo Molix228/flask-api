@@ -14,6 +14,7 @@ MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 app.config['SECRET_KEY'] = 'wazxdesz21'
 db = SQLAlchemy(app)
 
+
 class Car(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(50), nullable=False)
@@ -64,6 +65,11 @@ def get_cars():
 def add_car():
     try:
         form = request.form
+        file = request.files['photo']
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         print("Received Form Data:", form)
 
         new_car = Car(

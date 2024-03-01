@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, url_for
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -54,7 +54,7 @@ def get_cars():
                 'color': car.color,
                 'weight': car.weight,
                 'mileage': car.mileage,
-                'photo': car.photo,
+                'photo': url_for('static', filename=f'uploads/{car.photo}'),
                 'description': car.description
             })
         return jsonify({'cars': car_list})

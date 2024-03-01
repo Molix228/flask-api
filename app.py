@@ -64,6 +64,7 @@ def get_cars():
 def add_car():
     try:
         form = request.form
+        print("Received Form Data:", form)
 
         new_car = Car(
             brand=form['brand'],
@@ -84,6 +85,7 @@ def add_car():
 
         return jsonify({"message": "Car added successfully!"})
     except Exception as e:
+        print("Error:", e)
         db.session.rollback()
         return jsonify({"error": f"Internal Server Error: {e}"}), 500
 

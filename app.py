@@ -3,10 +3,11 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, CSRFProtect
 from wtforms import StringField, FileField
 
 app = Flask(__name__)
+csrf = CSRFProtect(app)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

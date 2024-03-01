@@ -1,5 +1,4 @@
 import os
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -14,6 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+app.config['SECRET_KEY'] = 'wazxdesz21'
 db = SQLAlchemy(app)
 
 

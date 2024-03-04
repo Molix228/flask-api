@@ -20,25 +20,25 @@ class Car(db.Model):
     photo = db.Column(db.String(100))
     description = db.Column(db.Text)
 
-def create_cars_app():
+def create_cars_app(app):  # Принимаем приложение как аргумент
     cars_app = Blueprint('cars_app', __name__)
     CORS(cars_app)
-    cars_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
-    cars_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    cars_app.config['UPLOAD_FOLDER'] = 'static/uploads'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['UPLOAD_FOLDER'] = 'static/uploads'
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-    cars_app.config['SECRET_KEY'] = 'wazxdesz21'
+    app.config['SECRET_KEY'] = 'wazxdesz21'
 
-    db.init_app(cars_app)
+    db.init_app(app)
 
-    with cars_app.app_context():
+    with app.app_context():
         db.create_all()
 
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-    cars_app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+    app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
     @cars_app.route('/api/cars', methods=['GET'])
     def get_cars():
@@ -72,7 +72,7 @@ def create_cars_app():
 
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(cars_app.app.config['UPLOAD_FOLDER'], filename))
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             print("Received Form Data:", form)
 
             new_car = Car(
@@ -104,7 +104,7 @@ def create_cars_app():
             car = Car.query.get_or_404(car_id)
 
             if car.photo:
-                photo_path = os.path.join(cars_app.app.config['UPLOAD_FOLDER'], car.photo)
+                photo_path = os.path.join(app.config['UPLOAD_FOLDER'], car.photo)
                 if os.path.exists(photo_path):
                     os.remove(photo_path)
 

@@ -40,7 +40,7 @@ def create_cars_app(app):  # Принимаем приложение как ар
 
     app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
-    @cars_app.route('/api/cars', methods=['GET'])
+    @cars_app.route('/', methods=['GET'])
     def get_cars():
         try:
             cars = Car.query.all()
@@ -64,7 +64,7 @@ def create_cars_app(app):  # Принимаем приложение как ар
         except Exception as e:
             return jsonify({'error': 'Internal Server Error'}), 500
 
-    @cars_app.route('/api/cars', methods=['POST'])
+    @cars_app.route('/', methods=['POST'])
     def add_car():
         try:
             form = request.form
@@ -98,7 +98,7 @@ def create_cars_app(app):  # Принимаем приложение как ар
             db.session.rollback()
             return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
-    @cars_app.route('/api/cars/<int:car_id>', methods=['DELETE'])
+    @cars_app.route('/<int:car_id>', methods=['DELETE'])
     def delete_car(car_id):
         try:
             car = Car.query.get_or_404(car_id)

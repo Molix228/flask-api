@@ -4,8 +4,6 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 
-cars_app = Blueprint('cars_app', __name__)
-
 db = SQLAlchemy()
 
 class Car(db.Model):
@@ -23,26 +21,26 @@ class Car(db.Model):
     description = db.Column(db.Text)
 
 def create_cars_app():
-    app = Flask(__name__)
-    CORS(app)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = 'static/uploads'
+    cars_app = Blueprint('cars_app', __name__)
+    CORS(cars_app)
+    cars_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
+    cars_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    cars_app.config['UPLOAD_FOLDER'] = 'static/uploads'
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-    app.config['SECRET_KEY'] = 'wazxdesz21'
+    cars_app.config['SECRET_KEY'] = 'wazxdesz21'
 
-    db.init_app(app)
+    db.init_app(cars_app)
 
-    with app.app_context():
+    with cars_app.app_context():
         db.create_all()
 
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-    app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+    cars_app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
-    @app.route('/api/cars', methods=['GET'])
+    @cars_app.route('/api/cars', methods=['GET'])
     def get_cars():
         try:
             cars = Car.query.all()
@@ -66,7 +64,7 @@ def create_cars_app():
         except Exception as e:
             return jsonify({'error': 'Internal Server Error'}), 500
 
-    @app.route('/api/cars', methods=['POST'])
+    @cars_app.route('/api/cars', methods=['POST'])
     def add_car():
         try:
             form = request.form
@@ -74,7 +72,7 @@ def create_cars_app():
 
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file.save(os.path.join(cars_app.app.config['UPLOAD_FOLDER'], filename))
             print("Received Form Data:", form)
 
             new_car = Car(
@@ -100,13 +98,13 @@ def create_cars_app():
             db.session.rollback()
             return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
-    @app.route('/api/cars/<int:car_id>', methods=['DELETE'])
+    @cars_app.route('/api/cars/<int:car_id>', methods=['DELETE'])
     def delete_car(car_id):
         try:
             car = Car.query.get_or_404(car_id)
-            # Удаление изображения из папки uploads
+
             if car.photo:
-                photo_path = os.path.join(app.config['UPLOAD_FOLDER'], car.photo)
+                photo_path = os.path.join(cars_app.app.config['UPLOAD_FOLDER'], car.photo)
                 if os.path.exists(photo_path):
                     os.remove(photo_path)
 
@@ -119,4 +117,4 @@ def create_cars_app():
             db.session.rollback()
             return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
-    return app
+    return cars_app

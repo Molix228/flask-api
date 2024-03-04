@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, jsonify, url_for, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from flask_cors import CORS
 
 db = SQLAlchemy()
 
@@ -38,6 +39,9 @@ def create_cars_app(app):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
     app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+
+    CORS(cars_app)
+    CORS(cars_app, resources={r"/*": {"origins": "*"}})
 
     @cars_app.route('/', methods=['GET'])
     def get_cars():

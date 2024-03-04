@@ -40,7 +40,6 @@ def create_cars_app(app):
 
     app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
-    CORS(cars_app)
     CORS(cars_app, resources={r"/*": {"origins": "*"}})
 
     @cars_app.route('/', methods=['GET'])

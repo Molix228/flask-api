@@ -1,6 +1,5 @@
 import os
 from flask import Flask, request, jsonify, url_for, Blueprint
-from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 
@@ -20,9 +19,9 @@ class Car(db.Model):
     photo = db.Column(db.String(100))
     description = db.Column(db.Text)
 
-def create_cars_app(app):  # Принимаем приложение как аргумент
+def create_cars_app(app):
     cars_app = Blueprint('cars_app', __name__)
-    CORS(cars_app)
+
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -46,20 +45,7 @@ def create_cars_app(app):  # Принимаем приложение как ар
             cars = Car.query.all()
             car_list = []
             for car in cars:
-                car_list.append({
-                    'id': car.id,
-                    'brand': car.brand,
-                    'model': car.model,
-                    'type': car.type,
-                    'axle': car.axle,
-                    'year': car.year,
-                    'price': car.price,
-                    'color': car.color,
-                    'weight': car.weight,
-                    'mileage': car.mileage,
-                    'photo': url_for('static', filename=f'uploads/{car.photo}'),
-                    'description': car.description
-                })
+                car_list.append(format_car(car))
             return jsonify({'cars': car_list})
         except Exception as e:
             return jsonify({'error': 'Internal Server Error'}), 500
@@ -116,5 +102,21 @@ def create_cars_app(app):  # Принимаем приложение как ар
             print("Error:", e)
             db.session.rollback()
             return jsonify({"error": f"Internal Server Error: {e}"}), 500
+
+    def format_car(car):
+        return {
+            'id': car.id,
+            'brand': car.brand,
+            'model': car.model,
+            'type': car.type,
+            'axle': car.axle,
+            'year': car.year,
+            'price': car.price,
+            'color': car.color,
+            'weight': car.weight,
+            'mileage': car.mileage,
+            'photo': url_for('static', filename=f'uploads/{car.photo}'),
+            'description': car.description
+        }
 
     return cars_app

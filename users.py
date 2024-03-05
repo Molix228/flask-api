@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from models import db, User
+from auth_utils import create_token, decode_token, token_required
 
 def create_users_app(app):
     users_app = Blueprint('users_app', __name__)
@@ -19,10 +20,29 @@ def create_users_app(app):
 
     CORS(users_app, resources={r"/*": {"origins": "*"}})
 
+    @users_app.route('/token', methods=['POST'])
+    def get_token():
+        data = request.json
+        username = data.get('username')
+        password = data.get('password')
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password, password):
+            token = create_token(user.id, app.config['SECRET_KEY'])
+            return jsonify({'token': token}), 200
+        else:
+            return jsonify({'error': 'Invalid credentials'}), 401
+
+    @users_app.route('/protected', methods=['GET'])
+    @token_required
+    def protected_route(current_user):
+        return jsonify({'message': f'Hello, {current_user.username}!'})
+
     @users_app.route('/register', methods=['POST'])
     def register_user():
         try:
-            data = request.form
+            data = request.json  # Изменено на использование JSON данных
             username = data.get('username')
             password = data.get('password')
             email = data.get('email')
@@ -32,7 +52,8 @@ def create_users_app(app):
                 return jsonify({'error': 'All fields are required'}), 400
 
             # Создание нового пользователя
-            new_user = User(username=username, password=generate_password_hash(password, method='pbkdf2:sha256'), email=email)
+            new_user = User(username=username, password=generate_password_hash(password, method='pbkdf2:sha256'),
+                            email=email)
             db.session.add(new_user)
             db.session.commit()
 

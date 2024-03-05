@@ -32,7 +32,7 @@ def create_users_app(app):
                 return jsonify({'error': 'All fields are required'}), 400
 
             # Создание нового пользователя
-            new_user = User(username=username, password=password, email=email)
+            new_user = User(username=username, password=generate_password_hash(password, method='sha256'), email=email)
             db.session.add(new_user)
             db.session.commit()
 

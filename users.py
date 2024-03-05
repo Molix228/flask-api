@@ -19,7 +19,7 @@ def create_users_app(app):
 
     CORS(users_app, resources={r"/*": {"origins": "*"}})
 
-    @users_app.route('/register', methods=['POST'])
+    @users_app.route('/api/users/register', methods=['POST'])
     def register_user():
         try:
             data = request.form
@@ -31,11 +31,8 @@ def create_users_app(app):
             if not username or not password or not email:
                 return jsonify({'error': 'All fields are required'}), 400
 
-            # Хеширование пароля перед сохранением в базу данных
-            hashed_password = generate_password_hash(password, method='sha256')
-
             # Создание нового пользователя
-            new_user = User(username=username, password=hashed_password, email=email)
+            new_user = User(username=username, password=password, email=email)
             db.session.add(new_user)
             db.session.commit()
 

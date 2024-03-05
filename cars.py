@@ -1,24 +1,9 @@
 import os
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import request, jsonify, url_for, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
-
-db = SQLAlchemy()
-
-class Car(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    brand = db.Column(db.String(50), nullable=False)
-    model = db.Column(db.String(50), nullable=False)
-    type = db.Column(db.String(50))
-    axle = db.Column(db.String(50))
-    year = db.Column(db.String(10))
-    price = db.Column(db.String(20))
-    color = db.Column(db.String(20))
-    weight = db.Column(db.String(20))
-    mileage = db.Column(db.String(20))
-    photo = db.Column(db.String(100))
-    description = db.Column(db.Text)
+from models import db, Car
 
 def create_cars_app(app):
     cars_app = Blueprint('cars_app', __name__)
@@ -30,10 +15,10 @@ def create_cars_app(app):
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     app.config['SECRET_KEY'] = 'wazxdesz21'
 
-    db.init_app(app)
-
-    with app.app_context():
-        db.create_all()
+    # db.init_app(app)
+    #
+    # with app.app_context():
+    #     db.create_all()
 
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

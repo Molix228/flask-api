@@ -19,7 +19,7 @@ def create_users_app(app):
 
     CORS(users_app, resources={r"/*": {"origins": "*"}})
 
-    @users_app.route('/api/users/register', methods=['POST'])
+    @users_app.route('/register', methods=['POST'])
     def register_user():
         try:
             data = request.form

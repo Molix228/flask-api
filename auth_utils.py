@@ -1,4 +1,3 @@
-# auth_utils.py
 from datetime import datetime, timedelta
 from functools import wraps
 import jwt

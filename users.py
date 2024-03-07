@@ -13,11 +13,6 @@ def create_users_app(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = 'wazxdesz21'
 
-    # db.init_app(app)
-    #
-    # with app.app_context():
-    #     db.create_all()
-
     CORS(users_app, resources={r"/*": {"origins": "*"}})
 
     @users_app.route('/token', methods=['POST'])
@@ -42,16 +37,14 @@ def create_users_app(app):
     @users_app.route('/register', methods=['POST'])
     def register_user():
         try:
-            data = request.json  # Изменено на использование JSON данных
+            data = request.json
             username = data.get('username')
             password = data.get('password')
             email = data.get('email')
 
-            # Проверка наличия обязательных данных
             if not username or not password or not email:
                 return jsonify({'error': 'All fields are required'}), 400
 
-            # Создание нового пользователя
             new_user = User(username=username, password=generate_password_hash(password, method='pbkdf2:sha256'),
                             email=email)
             db.session.add(new_user)
@@ -67,22 +60,18 @@ def create_users_app(app):
     @users_app.route('/login', methods=['POST'])
     def login_user():
         try:
-            data = request.json  # Изменено на использование JSON данных
+            data = request.json
             username_or_email = data.get('usernameOrEmail')
             password = data.get('password')
 
-            # Проверка наличия обязательных данных
             if not username_or_email or not password:
                 return jsonify({'error': 'Username or Email and Password are required'}), 400
 
-            # Попытка найти пользователя по логину или email
             user = User.query.filter((User.username == username_or_email) | (User.email == username_or_email)).first()
 
             if user and check_password_hash(user.password, password):
-                # Если пользователь найден и пароль совпадает, возвращаем успешный ответ
                 return jsonify({'message': 'Login successful'}), 200
             else:
-                # Иначе возвращаем ошибку о неверных учетных данных
                 return jsonify({'error': 'Invalid credentials'}), 401
 
         except Exception as e:

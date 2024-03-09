@@ -1,4 +1,6 @@
-car_data = {
+from datetime import datetime
+
+brands = {
     'Audi': ['A1', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'S4', 'S5', 'S6', 'S7', 'S8', 'RS-3', 'RS-4', 'RS-5', 'RS-6', 'RS-7', 'Q2', 'Q3', 'Q4', 'Q5', 'Q7', 'Q8', 'e-tron', 'TT', 'R8'],
     'Baic': ['Model1', 'Model2', 'Model3', 'Model4', 'Model5', 'EU5', 'EX5', 'BJ80', 'BJ40', 'BJ20'],
     'Baojun': ['ModelX', 'ModelY', 'ModelZ', 'ModelW', '510', '530', '360', 'RS-3', 'RS-5'],
@@ -50,3 +52,15 @@ car_data = {
     'Volvo': ['XC60', 'XC90', 'S90', 'S60', 'V60', 'XC40', 'V90', 'V40', 'C40 Recharge', 'S60 Polestar'],
     'Wuling': ['Hong Guang', 'Rong Guang', 'Mini EV', 'Cortez', 'Almaz', 'Confero', 'Formo', 'Sunshine', 'Journey', 'Future'],
 }
+
+
+current_year = datetime.now().year
+
+specs = {
+    'types': ['Sedan', 'Coupe', 'Touring', 'Hatchback', 'SUV', 'Minivan', 'Pickup', 'Cabrio'],
+    'axles': ['Front', 'Back', '4x4'],
+    'years': [str(year) for year in range(current_year, current_year - 75, -1)],
+    'colors': ['Black', 'White', 'Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Gray', 'Silver', 'Gold', 'Brown', 'Orange', 'Pink', 'Turquoise', 'Beige'],
+    'price': []
+}
+

@@ -4,16 +4,17 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from models import db, Car
+from config import Config
 
 def create_cars_app(app):
     cars_app = Blueprint('cars_app', __name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['UPLOAD_FOLDER'] = 'static/uploads'
+    app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URI
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = Config.SQLALCHEMY_TRACK_MODIFICATIONS
+    app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-    app.config['SECRET_KEY'] = 'wazxdesz21'
+    MAX_CONTENT_LENGTH = Config.MAX_CONTENT_LENGTH
+    app.config['SECRET_KEY'] = Config.SECRET_KEY
 
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

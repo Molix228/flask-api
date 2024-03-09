@@ -1,9 +1,11 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
-from cars import create_cars_app
-from users import create_users_app
+from services.cars import create_cars_app
+from services.users import create_users_app
 from config import Config
-from models import db
+from models import db, Car
+
+from services.car_data import car_data
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -16,6 +18,10 @@ with app.app_context():
 app.register_blueprint(create_cars_app(app), url_prefix='/api/cars')
 app.register_blueprint(create_users_app(app), url_prefix='/api/users/')
 
+
+@app.route('/api/car_data', methods=['GET'])
+def get_car_data():
+    return jsonify(car_data)
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
